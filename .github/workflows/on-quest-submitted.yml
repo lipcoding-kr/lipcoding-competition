@@ -1,0 +1,36 @@
+name: On Issue Submitted
+
+on:
+  issues:
+    types:
+      - opened
+  workflow_dispatch:
+    inputs:
+      issue-number:
+        description: "Issue number"
+        required: true
+
+permissions:
+  contents: read
+  id-token: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  verify-issue:
+    name: "Verify Issue Submitted"
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check event payload
+        shell: pwsh
+        run: |
+          $eventPayload = '${{ toJson(github) }}'
+
+      - name: Checkout quest checker repository
+        uses: actions/checkout@v4
+        with:
+          repository: lipcoding-kr/lipcoding-competition-tests
+          path: quest-checker
+          token: ${{ secrets.GH_PAT }}
