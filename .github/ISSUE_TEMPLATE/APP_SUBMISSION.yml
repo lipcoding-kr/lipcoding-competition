@@ -1,0 +1,146 @@
+name: '앱 제출'
+description: '앱 제출용 템플릿'
+title: "앱 제출"
+
+body:
+- type: markdown
+  attributes:
+    value: |
+      과제를 완료하신 분들은 이슈를 통해 인증을 받을 수 있습니다. 아래의 템플릿을 작성하여 이슈를 등록해 주세요. 이슈를 등록하면, 자동으로 해당 앱에 대한 테스트를 거쳐 본선 진출 여부를 결정합니다. 본선 진출자는 [본선 진출자 명단](.../../../../../hall-of-fame.md)에서 확인할 수 있습니다.
+
+      ## 앱 제출자 정보
+
+- type: dropdown
+  id: title
+  attributes:
+    label: '제목'
+    options:
+      - '천하제일 입코딩대회: 멘토-멘티 매칭 앱 개발'
+    default: 0
+
+- type: input
+  id: name
+  attributes:
+    label: '참가자 이름'
+    description: '참가자 이름을 입력하세요. (예: `송하윤`)'
+    placeholder: '참가자 이름을 입력하세요. (예: `송하윤`)'
+  validations:
+    required: true
+
+- type: input
+  id: github_id
+  attributes:
+    label: 'GitHub 프로필 URL'
+    description: 'GitHub 프로필 주소를 입력하세요. (예: [https://github.com/lipcoding-kr](https://github.com/lipcoding-kr))'
+    placeholder: 'GitHub 프로필 주소를 입력하세요. (예: https://github.com/lipcoding-kr)'
+  validations:
+    required: true
+
+- type: input
+  id: github_repository
+  attributes:
+    label: 'GitHub 리포지토리 URL'
+    description: '과제를 저장한 GitHub 리포지토리 주소를 입력하세요. (예: [https://github.com/lipcoding-kr/my-awesome-app](https://github.com/lipcoding-kr/my-awesome-app))'
+    placeholder: '과제를 저장한 GitHub 리포지토리 주소를 입력하세요. (예: https://github.com/lipcoding-kr/my-awesome-app)'
+  validations:
+    required: true
+
+- type: input
+  id: screenshot_url
+  attributes:
+    label: '스크린샷 URL'
+    description: '앱의 스크린샷 주소를 입력하세요. (예: [https://github.com/lipcoding-kr/my-awesome-app/blob/main/screenshot.png?raw=true](https://github.com/lipcoding-kr/my-awesome-app/blob/main/screenshot.png?raw=true))'
+    placeholder: '앱의 스크린샷 주소를 입력하세요. (예: https://github.com/lipcoding-kr/my-awesome-app/blob/main/screenshot.png?raw=true)'
+  validations:
+    required: true
+
+- type: input
+  id: promotion_video_url
+  attributes:
+    label: '소개 동영상 URL'
+    description: '앱의 소개 동영상 주소를 입력하세요. (예: [https://www.youtube.com/watch?v=IUY0TJEwnGA](https://www.youtube.com/watch?v=IUY0TJEwnGA))'
+    placeholder: '앱의 소개 동영상 주소를 입력하세요. (예: https://www.youtube.com/watch?v=IUY0TJEwnGA)'
+  validations:
+    required: true
+
+- type: markdown
+  attributes:
+    value: |
+      ## 프론트엔드 앱 정보
+
+- type: checkboxes
+  id: frontend_app_base_url
+  attributes:
+    label: '프론트엔드 앱 기본 URL'
+    description: '프론트엔드 앱 기본 URL은 `http://localhost:3000`입니다.'
+    options:
+      - label: 맞습니다
+        required: true
+
+- type: input
+  id: frontend_app_path
+  attributes:
+    label: '프론트엔드 앱 경로'
+    description: 'GitHub 리포지토리 내 프론트엔드 앱 경로를 입력해 주세요. (예: `./frontend`)'
+    placeholder: 'GitHub 리포지토리 내 프론트엔드 앱 경로를 입력해 주세요. (예: ./frontend)'
+  validations:
+    required: true
+
+- type: input
+  id: frontend_app_run_command
+  attributes:
+    label: '프론트엔드 앱 실행 명령어'
+    description: '프론트엔드 앱을 실행하기 위한 명령어를 입력해 주세요. 앱은 백그라운드 프로세스로 실행시켜야 합니다. (예: `npm install && npm start &` 또는 `./run_frontend.sh` 등)'
+    placeholder: '프론트엔드 앱을 실행하기 위한 명령어를 입력해 주세요. 앱은 백그라운드 프로세스로 실행시켜야 합니다. (예: "npm install && npm start &" 또는 "./run_frontend.sh" 등)'
+  validations:
+    required: true
+
+- type: markdown
+  attributes:
+    value: |
+      ## 백엔드 앱 정보
+
+- type: checkboxes
+  id: backend_app_base_url
+  attributes:
+    label: '백엔드 앱 기본 URL'
+    description: '백엔드 앱 기본 URL은 `http://localhost:8080/api`입니다.'
+    options:
+      - label: 맞습니다
+        required: true
+
+- type: input
+  id: backend_app_path
+  attributes:
+    label: '백엔드 앱 경로'
+    description: 'GitHub 리포지토리 내 백엔드 앱 경로를 입력해 주세요. (예: `./backend`)'
+    placeholder: 'GitHub 리포지토리 내 백엔드 앱 경로를 입력해 주세요. (예: ./backend)'
+  validations:
+    required: true
+
+- type: input
+  id: backend_app_run_command
+  attributes:
+    label: '백엔드 앱 실행 명령어'
+    description: '백엔드 앱을 실행하기 위한 명령어를 입력해 주세요. 앱은 백그라운드 프로세스로 실행시켜야 합니다. (예: `./gradlew build && ./gradlew bootRun &` 또는 `./run_backend.sh` 등)'
+    placeholder: '백엔드 앱을 실행하기 위한 명령어를 입력해 주세요. 앱은 백그라운드 프로세스로 실행시켜야 합니다. (예: "./gradlew build && ./gradlew bootRun &" 또는 "./run_backend.sh" 등)'
+  validations:
+    required: true
+
+- type: input
+  id: swagger_ui_url
+  attributes:
+    label: 'Swagger UI URL'
+    description: 'Swagger UI URL을 입력해 주세요. (예: `http://localhost:8080/swagger-ui`)'
+    placeholder: 'Swagger UI URL을 입력해 주세요. (예: http://localhost:8080/swagger-ui)'
+  validations:
+    required: true
+
+- type: input
+  id: openapi_doc_url
+  attributes:
+    label: 'OpenAPI 문서 URL'
+    description: 'OpenAPI 문서 URL을 입력해 주세요. (예: `http://localhost:8080/v3/api-docs`)'
+    placeholder: 'OpenAPI 문서 URL을 입력해 주세요. (예: http://localhost:8080/v3/api-docs)'
+  validations:
+    required: true

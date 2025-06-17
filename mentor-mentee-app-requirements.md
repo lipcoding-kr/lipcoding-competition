@@ -95,3 +95,11 @@
 - 백엔드 API는 Swagger UI 페이지를 렌더링할 수 있는 링크를 제공해야 합니다. (예: `http://localhost:8080/swagger-ui`)
 - Swagger UI를 통해 OpenAPI 문서 페이지로 이동할 수 있어야 합니다.
 - 백엔드 API URL인 `http://localhost:8080`으로 접속하면 자동으로 Swagger UI 화면으로 이동해야 합니다.
+
+### 7. 보안
+
+- 로컬 HTTPS 인증서는 사용하지 않습니다.
+  - 즉, 로컬에서 `http://localhost:3000` 또는 `http://localhost:8080`으로 접속할 수 있으면 충분합니다.
+- SQL 인젝션 공격에 대비해야 합니다.
+- XSS 공격에 대비해야 합니다.
+- OWASP TOP 10 취약점에 대비해야 합니다.
