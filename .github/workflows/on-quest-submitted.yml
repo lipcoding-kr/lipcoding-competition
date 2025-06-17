@@ -27,6 +27,28 @@ jobs:
         shell: pwsh
         run: |
           $eventPayload = '${{ toJson(github) }}'
+          $eventPayload | Out-File -FilePath ${{github.workspace}}/payload.json -Force
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'microsoft'
+          java-version: '21'
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.x'
 
       - name: Checkout quest checker repository
         uses: actions/checkout@v4
@@ -34,3 +56,17 @@ jobs:
           repository: lipcoding-kr/lipcoding-competition-tests
           path: quest-checker
           token: ${{ secrets.GH_PAT }}
+
+      - name: Verify issue
+        shell: bash
+        run: |
+          cd quest-checker
+          dotnet run --project ./LipCoding.IssueVerificationApp -- \
+            --input "${{ github.workspace }}/payload.json" \
+            --output "${{ github.workspace }}/issue.json" \
+            --due-date "${{ vars.DUE_DATE }}"
+
+      - name: Check validation result
+        shell: pwsh
+        run: |
+          Get-Content "${{ github.workspace }}/issue.json"
