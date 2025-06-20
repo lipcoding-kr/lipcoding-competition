@@ -1,8 +1,9 @@
 # 천하제일 입코딩 대회 2025
 
-[이미지]
-
-제 1회 천하제일 입코딩대회에 오신 것을 환영합니다!
+<div>
+  <p><img src="./images/hero.png" width="500" alt="천하제일입코딩대회 이미지"></p>
+  <p style="font-size: 16pt; font-weight: bold;"><strong>제 1회 천하제일 입코딩대회에 오신 것을 환영합니다!</strong></p>
+</div>
 
 ## 행사 정보
 
@@ -41,7 +42,7 @@
 
 ## 앱 제출
 
-<div style="font-size: 16pt; weight: bold;"><strong>앱 제출 마감 기한: 2025년 6월 28일 17시</strong></div>
+<div style="font-size: 16pt; font-weight: bold;"><strong>앱 제출 마감 기한: 2025년 6월 28일 17시</strong></div>
 
 <div>
   <br><a href="../../issues"><img src="images/submit.png" width="150" alt="앱 제출" /></a><br><br>
