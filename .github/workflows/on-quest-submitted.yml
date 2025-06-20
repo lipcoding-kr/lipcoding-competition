@@ -41,22 +41,6 @@ jobs:
           $eventPayload = gh api /repos/${{ github.repository }}/issues/${{ github.event.inputs.issue-number }}
           $eventPayload | Out-File -FilePath ${{github.workspace}}/payload.json -Force
 
-      - name: Install Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      - name: Install node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.x'
-
-      - name: Install Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'microsoft'
-          java-version: '21'
-
       - name: Install .NET SDK
         uses: actions/setup-dotnet@v4
         with:
@@ -74,23 +58,29 @@ jobs:
           github.event_name != 'workflow_dispatch'
         shell: bash
         run: |
-          cd quest-checker
+          pushd ./quest-checker
+
           dotnet run --project ./LipCoding.IssueVerificationApp -- \
             --input "${{ github.workspace }}/payload.json" \
             --output "${{ github.workspace }}/issue.json" \
             --due-date "${{ vars.DUE_DATE }}"
+          
+          popd
 
       - name: Verify issue - from workflow_dispatch
         if: |
           github.event_name == 'workflow_dispatch'
         shell: bash
         run: |
-          cd quest-checker
+          pushd ./quest-checker
+
           dotnet run --project ./LipCoding.IssueVerificationApp -- \
             --input "${{ github.workspace }}/payload.json" \
             --output "${{ github.workspace }}/issue.json" \
             --due-date "${{ vars.DUE_DATE }}" \
             --workflow-dispatch
+
+          popd
 
       - name: Check validation result
         id: issue
@@ -167,7 +157,9 @@ jobs:
             - 앱 제출 시각: ${{ steps.issue.outputs.submittedAt }}
             - 앱 제출 마감 시각: ${{ steps.issue.outputs.dueBy }}
 
-            제출하신 앱은 현재 확인 중이며, 완료 여부를 확인한 후 다시 알려드리겠습니다.
+            제출하신 앱은 현재 테스트 중이며, 테스트 통과 여부를 다시 알려드리겠습니다.
+
+            👉 [앱 테스트 진행과정 확인하기](../actions/runs/${{ github.run_id }}) 👈
             
             > **참고**: 제출하신 앱의 규모에 따라 테스트를 거쳐 확인하는 데 시간이 걸릴 수 있습니다. ⏳
 
@@ -193,8 +185,353 @@ jobs:
         with:
           name: issue-payload
 
-      - name: Check validation result
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get app details
         id: issue
         shell: pwsh
         run: |
-          Get-Content "${{ github.workspace }}/issue.json"
+          $issue = Get-Content "${{ github.workspace }}/issue.json" | ConvertFrom-Json
+
+          echo "name=$($issue.body.participantName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "issueNumber=$($issue.number)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "githubId=$($issue.body.gitHubHandle)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "repository=$($issue.body.gitHubRepository)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "screenshot=$($issue.body.screenshotUrl)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "video=$($issue.body.promotionVideoUrl)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "frontend=$($issue.body.frontendAppPath)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "backend=$($issue.body.backendAppPath)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "frontendCommand=$($issue.body.frontendAppRunCommand)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "backendCommand=$($issue.body.backendAppRunCommand)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "swaggerUIUrl=$($issue.body.swaggerUIUrl)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "openAPIUrl=$($issue.body.openAPIUrl)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'microsoft'
+          java-version: '21'
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.x'
+
+      - name: Checkout quest checker repository
+        uses: actions/checkout@v4
+        with:
+          repository: lipcoding-kr/lipcoding-competition-tests
+          path: quest-checker
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Checkout app repository
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          repository: ${{ steps.issue.outputs.repository }}
+          path: app
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Close issue - Invalid repository
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+            --add-label "invalid" \
+            -R ${{ github.event.repository.full_name }}
+
+          gh issue comment ${{ steps.issue.outputs.issueNumber }} \
+            -b "제출한 리포지토리가 존재하지 않습니다." \
+            -R ${{ github.event.repository.full_name }}
+
+          gh issue close ${{ steps.issue.outputs.issueNumber }} \
+            -c "제출한 앱이 유효하지 않습니다. 이슈를 닫습니다." \
+            -R ${{ github.event.repository.full_name }}
+
+          exit 1
+      
+      - name: Check app structure
+        id: check-structure
+        shell: pwsh
+        run: |
+          $frontendAppPath = "${{ github.workspace }}/app/${{ steps.issue.outputs.frontend }}"
+          $backendAppPath = "${{ github.workspace }}/app/${{ steps.issue.outputs.backend }}"
+
+          $validFrontend = $true
+          $validBackend = $true
+
+          if (-not (Test-Path -Path $frontendAppPath)) {
+            Write-Error "Frontend app path '$frontendAppPath' does not exist."
+            $validFrontend = $false
+          }
+
+          if (-not (Test-Path -Path $backendAppPath)) {
+            Write-Error "Backend app path '$backendAppPath' does not exist."
+            $validBackend = $false
+          }
+
+          echo "isValid=$($validFrontend -and $validBackend)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+
+      - name: Add a label - Invalid
+        if: |
+          steps.check-structure.outputs.isValid == 'false'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+            --add-label "invalid" \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Comment to issue - Invalid
+        if: |
+          steps.check-structure.outputs.isValid == 'false'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "create-comment"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.issue.outputs.issueNumber }}
+          body: |
+            👋🏼 @${{ steps.issue.outputs.githubId }} 님!
+
+            프론트엔드 앱 또는 백엔드 앱을 찾을 수 없습니다. 😢 경로를 다시 한 번 확인하세요.
+
+      - name: Close issue - Invalid
+        if: |
+          steps.check-structure.outputs.isValid == 'false'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue close ${{ steps.issue.outputs.issueNumber }} \
+            -c "제출한 앱이 유효하지 않습니다. 이슈를 닫습니다." \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Fail the job - Invalid structure
+        if: |
+          steps.check-structure.outputs.isValid == 'false'
+        shell: bash
+        run: |
+          echo "The structure of the submitted app is invalid. Please check the paths and try again."
+          exit 1
+
+      - name: Run backend app
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pushd "${{ github.workspace }}/app/${{ steps.issue.outputs.backend }}"
+
+          eval "${{ steps.issue.outputs.backendCommand }}"
+
+          popd
+
+      - name: Wait for backend to be ready
+        run: |
+          for i in {1..30}; do
+            if nc -z localhost 8080; then
+              echo "Backend is up!"
+              break
+            fi
+            echo "Waiting for backend..."
+            sleep 2
+          done
+
+      - name: Run frontend app
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pushd "${{ github.workspace }}/app/${{ steps.issue.outputs.frontend }}"
+
+          eval "${{ steps.issue.outputs.frontendCommand }}"
+
+          popd
+
+      - name: Wait for frontend to be ready
+        run: |
+          for i in {1..30}; do
+            if nc -z localhost 3000; then
+              echo "Frontend is up!"
+              break
+            fi
+            echo "Waiting for frontend..."
+            sleep 2
+          done
+
+      - name: Set up test environment
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pushd ./quest-checker
+
+          $appsettings = Get-Content -Path ./LipCoding.BackendTests/appsettings.json -Raw | ConvertFrom-Json
+          $appsettings.ApiSettings.SwaggerUIUrl = "http://localhost:8080/${{ steps.issue.outputs.swaggerUIUrl }}"
+          $appsettings.ApiSettings.OpenApiDocumentUrl = "http://localhost:8080/${{ steps.issue.outputs.openAPIUrl }}"
+
+          $appsettings | ConvertTo-Json -Depth 100 | Out-File -FilePath ./LipCoding.BackendTests/appsettings.json -Encoding utf8 -Force
+
+          popd
+
+      - name: Build test apps
+        shell: bash
+        run: |
+          pushd ./quest-checker
+
+          dotnet restore && dotnet build
+
+          popd
+
+      - name: Install Playwright
+        shell: bash
+        run: |
+          pushd ./quest-checker
+
+          pwsh ./LipCoding.FrontendTests/bin/Debug/net9.0/playwright.ps1 install
+
+          popd
+
+      - name: Run tests - Backend
+        shell: bash
+        run: |
+          pushd ./quest-checker
+
+          dotnet test ./LipCoding.BackendTests --logger "trx;LogFileName=test-results-backend.trx" --no-build
+
+          popd
+
+      - name: Run tests - Frontend
+        shell: bash
+        run: |
+          pushd ./quest-checker
+
+          dotnet test ./LipCoding.FrontendTests --logger "trx;LogFileName=test-results-frontend.trx" --no-build
+
+          popd
+
+      - name: Check the test results
+        id: test-results
+        shell: pwsh
+        run: |
+          pushd ./quest-checker
+
+          $files = Get-ChildItem *.trx -Recurse | Select-Object -Property FullName
+
+          $result = ./gha-scripts/Check-UnitTestResults.ps1 -FilePaths $files.FullName
+          $message = if ($result -eq $true) { "Test passed" } else { "Test NOT passed" }
+
+          echo "passed=$($result.ToString().ToLower())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "message=$message" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+
+          popd
+
+      - name: Add a label - Test Failed
+        if: |
+          steps.test-results.outputs.passed == 'false'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+            --add-label "failed" \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Comment to issue - Test Failed
+        if: |
+          steps.test-results.outputs.passed == 'false'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "create-comment"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.issue.outputs.issueNumber }}
+          body: |
+            👋🏼 @${{ steps.issue.outputs.githubId }} 님!
+
+            제출하신 앱이 테스트를 통과하지 못했습니다. 요구사항을 다시 한 번 확인하고, 앱을 수정한 후 다시 제출해 주세요. 😢
+
+      - name: Close issue - Test Failed
+        if: |
+          steps.test-results.outputs.passed == 'false'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue close ${{ steps.issue.outputs.issueNumber }} \
+            -c "제출한 앱이 테스트를 통과하지 못했습니다. 이슈를 닫습니다." \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Add a label - Test Passed
+        if: |
+          steps.test-results.outputs.passed == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+            --add-label "passed" \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Comment to issue - Test Passed
+        if: |
+          steps.test-results.outputs.passed == 'true'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "create-comment"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.issue.outputs.issueNumber }}
+          body: |
+            👋🏼 @${{ steps.issue.outputs.githubId }} 님!
+
+            제출하신 앱이 테스트를 통과했습니다. 수고하셨습니다! 🎉
+
+      - name: Update Hall of Fame
+        if: |
+          steps.test-results.outputs.passed == 'true'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $hallOfFame = Get-Content -Path ./hall-of-fame.md -Raw
+          $hallOfFame += "| ${{ steps.issue.outputs.name }} "
+          $hallOfFame += "| [@${{ steps.issue.outputs.githubId }}](https://github.com/${{ steps.issue.outputs.githubId }}) "
+          $hallOfFame += "| [${{ steps.issue.outputs.repository }}](${{ steps.issue.outputs.repository }}) "
+          $hallOfFame += "| [${{ steps.issue.outputs.video }}](${{ steps.issue.outputs.video }}) "
+          $hallOfFame += "| ${{ steps.issue.outputs.submittedAt }} |`n"
+          $hallOfFame | Out-File -FilePath ./hall-of-fame.md -Encoding utf8 -Force
+
+          $readme = Get-Content -Path ./README.md -Raw
+          $readme += "| ${{ steps.issue.outputs.name }} "
+          $readme += "| [@${{ steps.issue.outputs.githubId }}](https://github.com/${{ steps.issue.outputs.githubId }}) "
+          $readme += "| [${{ steps.issue.outputs.repository }}](${{ steps.issue.outputs.repository }}) "
+          $readme += "| [${{ steps.issue.outputs.video }}](${{ steps.issue.outputs.video }}) "
+          $readme += "| ${{ steps.issue.outputs.submittedAt }} |`n"
+          $readme | Out-File -FilePath ./README.md -Encoding utf8 -Force
+
+          git add .
+          git commit -m "앱 제출자 명단 업데이트 - ${{ steps.issue.outputs.name }}(@${{ steps.issue.outputs.githubId }})"
+          git push origin main
+
+      - name: Close issue - Test Passed
+        if: |
+          steps.test-results.outputs.passed == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue close ${{ steps.issue.outputs.issueNumber }} \
+            -c "제출한 앱이 테스트를 통과했습니다. 이슈를 닫습니다." \
+            -R ${{ github.event.repository.full_name }}
