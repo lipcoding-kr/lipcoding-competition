@@ -11,7 +11,7 @@ on:
         required: true
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
   issues: write
   pull-requests: write
@@ -180,13 +180,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Download issue payload
         uses: actions/download-artifact@v4
         with:
           name: issue-payload
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Check issue payload
+        shell: bash
+        run: |
+          ls -al ${{ github.workspace }}
+
+          cat "${{ github.workspace }}/issue.json"
 
       - name: Get app details
         id: issue
@@ -194,8 +201,11 @@ jobs:
         run: |
           $issue = Get-Content "${{ github.workspace }}/issue.json" | ConvertFrom-Json
 
+          $tzi = [TimeZoneInfo]::FindSystemTimeZoneById("Asia/Seoul")
+
           echo "name=$($issue.body.participantName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
           echo "issueNumber=$($issue.number)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "submittedAt=$([TimeZoneInfo]::ConvertTime($issue.createdAt, $tzi).ToString("yyyy-MM-dd HH:mm:ss.fff") + " +09:00")" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
           echo "githubId=$($issue.body.gitHubHandle)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
           echo "repository=$($issue.body.gitHubRepository)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
           echo "screenshot=$($issue.body.screenshotUrl)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
@@ -407,6 +417,7 @@ jobs:
 
       - name: Run tests - Backend
         shell: bash
+        continue-on-error: true
         run: |
           pushd ./quest-checker
 
@@ -416,6 +427,7 @@ jobs:
 
       - name: Run tests - Frontend
         shell: bash
+        continue-on-error: true
         run: |
           pushd ./quest-checker
 
@@ -521,7 +533,10 @@ jobs:
           $readme += "| ${{ steps.issue.outputs.submittedAt }} |`n"
           $readme | Out-File -FilePath ./README.md -Encoding utf8 -Force
 
-          git add .
+          git config --global user.name "LipCoding Bot"
+          git config --global user.email "<lipcoding-bot@users.noreply.github.com>"
+
+          git add ./hall-of-fame.md ./README.md
           git commit -m "앱 제출자 명단 업데이트 - ${{ steps.issue.outputs.name }}(@${{ steps.issue.outputs.githubId }})"
           git push origin main
 

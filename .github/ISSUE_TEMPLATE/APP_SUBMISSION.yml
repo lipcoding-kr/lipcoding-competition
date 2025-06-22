@@ -74,9 +74,9 @@ body:
   id: frontend_app_base_url
   attributes:
     label: '프론트엔드 앱 기본 URL'
-    description: '프론트엔드 앱 기본 URL은 `http://localhost:3000`입니다.'
+    description: '프론트엔드 앱 기본 URL 주소를 확인합니다.'
     options:
-      - label: 맞습니다
+      - label: 프론트엔드 앱 기본 URL은 `http://localhost:3000`입니다.
         required: true
 
 - type: input
@@ -108,9 +108,9 @@ body:
   id: backend_app_base_url
   attributes:
     label: '백엔드 앱 기본 URL'
-    description: '백엔드 앱 기본 URL은 `http://localhost:8080/api`입니다.'
+    description: '백엔드 앱 기본 URL 주소를 확인합니다.'
     options:
-      - label: 맞습니다
+      - label: 백엔드 앱 기본 URL은 `http://localhost:8080/api`입니다.
         required: true
 
 - type: input
