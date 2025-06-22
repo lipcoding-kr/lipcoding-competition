@@ -234,7 +234,7 @@ SO THAT the mentor cannot see my message.
 
 ### 5. 매칭 요청
 
-- 요청 메시지 인풋 필드: `id`=`message`
+- 요청 메시지 인풋 필드: `id`=`message`, `data-mentor-id`=`{{mentor-id}}`, `data-testid`=`message-{{mentor-id}}`
 - 요청 상태: `id`=`request-status`
 - 요청 버튼: `id`=`request`
 

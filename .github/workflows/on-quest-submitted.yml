@@ -434,7 +434,7 @@ jobs:
           $result = ./gha-scripts/Check-UnitTestResults.ps1 -FilePaths $files.FullName
           $message = if ($result -eq $true) { "Test passed" } else { "Test NOT passed" }
 
-          echo "passed=$($result.ToString().ToLower())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "passed=$($result.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
           echo "message=$message" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
 
           popd

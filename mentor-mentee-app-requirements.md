@@ -64,8 +64,8 @@
 
 ### 2. OpenAPI 설계 우선 원칙
 
-- [API 명세](./mentor-mentee-api-spec.md)에 정의한 대로 OpenAPI 문서를 생성해야 합니다.
-- 생성한 OpenAPI 문서를 바탕으로 프론트엔드 UI 앱과 백엔드 API 앱을 구현해야 합니다.
+- [API 명세](./mentor-mentee-api-spec.md)에 정의한 대로 작성한 [OpenAPI 문서](./openapi.yaml)를 제공합니다.
+- 제공하는 OpenAPI 문서를 바탕으로 프론트엔드 UI 앱과 백엔드 API 앱을 구현해야 합니다.
 
 ### 3. JWT 클레임
 

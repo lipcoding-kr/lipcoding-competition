@@ -38,6 +38,7 @@
 - [요구사항](./mentor-mentee-app-requirements.md)
 - [사용자 스토리](./mentor-mentee-app-user-stories.md)
 - [API 명세](./mentor-mentee-api-spec.md)
+- [OpenAPI 문서](./openapi.yaml)
 - [평가 방식](./mentor-mentee-app-assessment.md)
 
 ## 앱 제출
