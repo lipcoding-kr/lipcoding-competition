@@ -64,5 +64,5 @@
 | 이름 | GitHub ID | 리포지토리 주소 | 제출 시각 |
 |------|-----------|-----------------|-----------|
 | 오다혜 | [@devohda](https://github.com/devohda) | [devohda/lipcoding](https://github.com/devohda/lipcoding) | <img src="https://img.shields.io/badge/16%3A40%3A53-blue" alt="제출시각: 2025-06-28 16:40:53.000 +09:00" /> |
-| 정성민 | [@JSpiner](https://github.com/JSpiner) | [JSpiner/lipcoding-competition](https://github.com/JSpiner/lipcoding-competition) | <img src="https://img.shields.io/badge/17%3A09%3A56-blue" alt="제출시각: 2025-06-28 17:09:56.000 +09:00" /> |
 | 이찬영 | [@coldzero94](https://github.com/coldzero94) | [coldzero94/lipcoding](https://github.com/coldzero94/lipcoding) | <img src="https://img.shields.io/badge/17%3A05%3A13-blue" alt="제출시각: 2025-06-28 17:05:13.000 +09:00" /> |
+| 정성민 | [@JSpiner](https://github.com/JSpiner) | [JSpiner/lipcoding-competition](https://github.com/JSpiner/lipcoding-competition) | <img src="https://img.shields.io/badge/17%3A09%3A56-blue" alt="제출시각: 2025-06-28 17:09:56.000 +09:00" /> |
