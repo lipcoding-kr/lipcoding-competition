@@ -49,7 +49,7 @@
 
 ## 앱 제출
 
-<div style="font-size: 16pt; font-weight: bold;"><strong>앱 제출 마감 기한: 2025년 6월 28일 17시</strong></div>
+<div style="font-size: 16pt; font-weight: bold;"><strong>앱 제출 마감 기한: 2025년 6월 28일 17시 15분</strong></div>
 
 <div>
   <br><a href="../../issues"><img src="images/submit.png" width="150" alt="앱 제출" /></a><br><br>
@@ -57,13 +57,12 @@
 
 앱 개발을 마친 참가자는 [![앱제출](https://img.shields.io/badge/%EC%95%B1%20%EC%A0%9C%EC%B6%9C-2D8655)](../../issues)을 클릭해서 자신이 완성한 앱의 리포지토리와 관련 정보를 등록합니다. 이후 GitHub Actions 워크플로우를 통해 이슈에 등록한 내용을 바탕으로 평가를 진행합니다.
 
-> **참고**: 이 때 최종 제출 시각을 넘겨서 제출한 참가자는 자동으로 탈락합니다. 최종 제출 시각은 **2025년 6월 28일 17시**입니다.
+> **참고**: 이 때 최종 제출 시각을 넘겨서 제출한 참가자는 자동으로 탈락합니다. 최종 제출 시각은 **2025년 6월 28일 17시 15분**입니다.
 
 ## 본선 진출자 명단
 
-| 이름 | GitHub ID | 리포지토리 주소 | 동영상 주소 | 제출 시각 |
-|------|-----------|-----------------|-------------|-----------|
-| 오다혜 | [@devohda](https://github.com/devohda) | [devohda/lipcoding](https://github.com/devohda/lipcoding) | [https://www.youtube.com/watch?v=IUY0TJEwnGA](https://www.youtube.com/watch?v=IUY0TJEwnGA) | <img src="https://img.shields.io/badge/16%3A40%3A53-blue" alt="제출시각: 2025-06-28 16:40:53.000 +09:00" /> |
-| 이찬영 | [@coldzero94](https://github.com/coldzero94) | [coldzero94/lipcoding](https://github.com/coldzero94/lipcoding) | [https://www.youtube.com/watch?v=alNilKfLHXA](https://www.youtube.com/watch?v=alNilKfLHXA) | <img src="https://img.shields.io/badge/17%3A05%3A13-blue" alt="제출시각: 2025-06-28 17:05:13.000 +09:00" /> |
-| 오다혜 | [@devohda](https://github.com/devohda) | [devohda/lipcoding](https://github.com/devohda/lipcoding) | [https://youtu.be/aAB_wRqVavM](https://youtu.be/aAB_wRqVavM) | <img src="https://img.shields.io/badge/17%3A10%3A34-blue" alt="제출시각: 2025-06-28 17:10:34.000 +09:00" /> |
-| 정성민 | [@JSpiner](https://github.com/JSpiner) | [JSpiner/lipcoding-competition](https://github.com/JSpiner/lipcoding-competition) | --- | 수동입력 |
+| 이름 | GitHub ID | 리포지토리 주소 | 제출 시각 |
+|------|-----------|-----------------|-----------|
+| 오다혜 | [@devohda](https://github.com/devohda) | [devohda/lipcoding](https://github.com/devohda/lipcoding) | <img src="https://img.shields.io/badge/16%3A40%3A53-blue" alt="제출시각: 2025-06-28 16:40:53.000 +09:00" /> |
+| 정성민 | [@JSpiner](https://github.com/JSpiner) | [JSpiner/lipcoding-competition](https://github.com/JSpiner/lipcoding-competition) | <img src="https://img.shields.io/badge/17%3A09%3A56-blue" alt="제출시각: 2025-06-28 17:09:56.000 +09:00" /> |
+| 이찬영 | [@coldzero94](https://github.com/coldzero94) | [coldzero94/lipcoding](https://github.com/coldzero94/lipcoding) | <img src="https://img.shields.io/badge/17%3A05%3A13-blue" alt="제출시각: 2025-06-28 17:05:13.000 +09:00" /> |
